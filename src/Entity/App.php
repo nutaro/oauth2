@@ -12,7 +12,7 @@ class App
     #[ORM\Column]
     private ?string $client_id = null;
 
-    #[ORM\Column]
+    #[ORM\Column(length: 255, unique: true)]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
@@ -28,7 +28,7 @@ class App
         $this->name = $name;
         return $this;
     }
-    public function getId(): ?int
+    public function getId(): ?string
     {
         return $this->client_id;
     }
