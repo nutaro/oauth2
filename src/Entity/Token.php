@@ -28,10 +28,10 @@ class Token
     #[ORM\Column(length: 255, nullable: false)]
     private ?string $token = null;
 
-    #[ORM\Column(type: DateTimeType::class)]
+    #[ORM\Column(type: "datetime")]
     private ?DateTime $created_at;
 
-    #[ORM\Column(type: DateTimeType::class)]
+    #[ORM\Column(type: "datetime")]
     private ?DateTime $valid_until = null;
 
     #[ORM\ManyToOne]
@@ -39,7 +39,7 @@ class Token
     private ?User $user = null;
 
     #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(referencedColumnName: "client_id", nullable: false)]
     private ?App $app = null;
 
     public function getId(): ?int
