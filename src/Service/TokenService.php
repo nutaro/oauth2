@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Entity\RefreshToken;
 use App\Entity\Token;
 use App\Entity\User;
 use App\Entity\App;
@@ -58,11 +59,18 @@ class TokenService {
         $token->setValidUntil($date);
         $this->entityManager->persist($token);
         $this->entityManager->flush();
-        return ["token" => $token->getToken(), "refresh_token" => $this->getRefreshToken()];
+        return ["token" => $token->getToken(), "refresh_token" => $this->createRefreshToken()];
     }
 
-    protected function getRefreshToken(): string
+    protected function createRefreshToken(): string
     {
+        $token = new RefreshToken();
+        $token->setApp($this->app);
+        $token->setUser($this->user);
+        $token->setRefreshToken(Uuid::v4());
+        $date = new DateTime("now", new DateTimeZone("America/Sao_Paulo"));
+        $date->modify("+30 minutes");
+        $token->setValidUntil($date);
         return Uuid::v4();
     }
 }
