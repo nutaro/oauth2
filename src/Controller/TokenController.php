@@ -45,4 +45,25 @@ class TokenController extends AbstractController
 
     }
 
+    #[Route('/token/refresh', name: 'token_refresh', methods: ['POST'])]
+    public function refresh_token(EntityManagerInterface $entityManager, Request $request): Response
+    {
+        try {
+            $data = json_decode($request->getContent(), true);
+            $this->logger->info("Create token service");
+            $service = new TokenService($entityManager);
+            $service->setApp($data["client_id"], $data["client_secret"]);
+            $this->logger->info("App Setted");
+            $service->setUserByRefreshToken($data["refresh_token"]);
+            $this->logger->info("User Logged");
+            return $this->json($service->createToken(), Response::HTTP_CREATED);
+        } catch (NotFoundException $e) {
+            return $this->json([], Response::HTTP_FAILED_DEPENDENCY);
+        } catch (UnauthorizeException $e) {
+            return $this->json([], Response::HTTP_UNAUTHORIZED);
+        } catch (\Exception $e) {
+            $this->logger->error($e->getMessage());
+            return $this->json([], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 }

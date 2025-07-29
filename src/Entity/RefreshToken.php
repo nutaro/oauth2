@@ -15,7 +15,7 @@ class RefreshToken
      */
     public function __construct()
     {
-        $this->created_at = new DateTime("now", new DateTimeZone("America/Sao_Paulo"));
+        $this->created_at = new DateTime("now");
     }
 
     #[ORM\Id]
@@ -31,7 +31,7 @@ class RefreshToken
     private ?User $user = null;
 
     #[ORM\ManyToOne]
-    #[ORM\JoinColumn(referencedColumnName: "client_id", nullable: false)]
+    #[ORM\JoinColumn(name: "app_id", referencedColumnName: "client_id", nullable: false)]
     private ?App $app = null;
 
     #[ORM\Column]

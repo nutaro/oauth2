@@ -17,7 +17,7 @@ class Token
      */
     public function __construct()
     {
-        $this->created_at = new DateTime("now", new DateTimeZone("America/Sao_Paulo"));
+        $this->created_at = new DateTime("now");
     }
 
     #[ORM\Id]

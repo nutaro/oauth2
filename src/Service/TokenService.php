@@ -14,10 +14,12 @@ use DateTimeZone;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Uid\Uuid;
 
-class TokenService {
+class TokenService
+{
     private User $user;
     private App $app;
     private EntityManagerInterface $entityManager;
+
     public function __construct(EntityManagerInterface $entityManager)
     {
         $this->entityManager = $entityManager;
@@ -68,9 +70,25 @@ class TokenService {
         $token->setApp($this->app);
         $token->setUser($this->user);
         $token->setRefreshToken(Uuid::v4());
-        $date = new DateTime("now", new DateTimeZone("America/Sao_Paulo"));
+        $date = new DateTime("now");
         $date->modify("+30 minutes");
         $token->setValidUntil($date);
-        return Uuid::v4();
+        $this->entityManager->persist($token);
+        $this->entityManager->flush();
+        return $token->getRefreshToken();
+    }
+
+    public function setUserByRefreshToken(string $refreshToken): void
+    {
+        $repository = $this->entityManager->getRepository(RefreshToken::class);
+        $refreshToken = $repository->findOneBy([
+            "refresh_token" => $refreshToken,
+            "app" => $this->app
+        ]);
+        if (!$refreshToken)
+            throw new UnauthorizeException();
+        if ($refreshToken->getValidUntil() < (new DateTime("now")))
+            throw new UnauthorizeException();
+        $this->user = $refreshToken->getUser();
     }
 }
